@@ -1,5 +1,7 @@
 
 //todo: fix map.length things to proper c++ syntax
+//todo: fix array notation to vector notation: i.e. push_back etc. .length etc.
+//possibly todo: implement that when cell dies, there's a certain chance it becomes a hole instead of open space
 
 /* RULES
 if a wall/ramp has less than 2 similar neighbours, it dies
@@ -55,27 +57,19 @@ public mapVector initialiseMap(mapVector map) {
 
 
 public mapVector doSimulationStep(mapVector oldMap) {
-	mapVector newMap = new mapVector[width][height];
+	mapVector newMap; // do I need to implement the size?
+	
 	//loop over each row and column of the map
 	for(int x=0; x < oldMap.length; x++){
 		for (int y=0; y<oldMap[0].length; y++){
-			int nbs = countAlikeNeighbours(oldMap, x, y);
-			//the new value is based on our simulation rules
-			//TODO: change death limit and birth limits for different types??
-			//first, if a cell is not a open space and has too few neighbours, kill it
-			//TODO: include up to 2 in the != statement?
-			//TODO: only implement changing for obstacle, open space, and ramp
-
-			if(oldMap[x][y] == -2){
-				if(nbs < 2){
-					newMap[x][y] = 1;
-				}
-				else{
-					newMap[x][y] = oldMap[x][y];
-				}
-			} 
-			else if (oldMap[x][y] != 1 && oldMap[x][y] != -2) {
-				if(nbs < 3){
+			//check what type it is to determine course of action
+			if (oldMap[x][y] == 4) {
+				//if victim, do nothing
+			}
+			else if (oldMap[x][y] == -2 || (oldMap[x][y] > 1 && oldMap[x][y] <= 2)) {
+				// if an obstacle or a ramp
+				int similarNeighbours = countAlikeNeighbours(oldMap, x, y);
+				if (similarNeighbours < 2) {
 					newMap[x][y] = 1;
 				}
 				else {
@@ -83,13 +77,16 @@ public mapVector doSimulationStep(mapVector oldMap) {
 				}
 			}
 
-			//otherwise, if the cell is open now, check if it has the right number of neighbours to be ramp or obstacle
-			//check what it has most neighbours of first................
-			else{
-				if(nbs > 2){
-					newMap[x][y] = ;
+			else if (oldMap[x][y] == -3 || oldMap[x][y] == 1) {
+				// if a hole or open space
+				int highestNeighbour = countHighestNeighbour(oldMap, x, y);
+				if (highestNeighbour == -2) {
+					newMap[x][y] = -2;
 				}
-				else{
+				else if (highestNeighbour == 2) {
+					newMap[x][y] = 2;
+				}
+				else if (highestNeighbour == 0) {
 					newMap[x][y] = oldMap[x][y];
 				}
 			}
@@ -103,10 +100,9 @@ public mapVector doSimulationStep(mapVector oldMap) {
 
 
 
-
+//returns number of alike neighbours
 //for wall and ramp to see whether they live or die
 public int countAlikeNeighbours(mapVector map, int x, int y) {
-//implement separate part for between (1,2]
 	int alikeCount = 0;
 
 	for (int i =-1; i<2; i++) {
@@ -127,7 +123,7 @@ public int countAlikeNeighbours(mapVector map, int x, int y) {
 			}
 		}
 	}
-	return count;
+	return alikeCount;
 }
 
 
@@ -136,7 +132,7 @@ public int countAlikeNeighbours(mapVector map, int x, int y) {
 
 
 
-
+//returns the number which it should transform to, 0 if stay the same
 //count amount of walls and ramps
 //compare which neighbour is highest. then, if over a threshold, return the type. in the receiver, if return is the type, change it to that. else, keep it the same
 public int countHighestNeighbour(mapVector map, int x, int y) {
