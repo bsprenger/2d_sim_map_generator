@@ -2,7 +2,7 @@
 //todo: fix map.length things to proper c++ syntax
 //todo: fix array notation to vector notation: i.e. push_back etc. .length etc.
 //possibly todo: implement that when cell dies, there's a certain chance it becomes a hole instead of open space
-
+//todo: change from array to vector the WHOLE WAY THROUGH UNLESS GIVEN WIDTH AND LENGTH AT START
 /* RULES
 if a wall/ramp has less than 2 similar neighbours, it dies
 ----to implement if having problems------
@@ -15,35 +15,42 @@ if an open space or hole has 3 neighbours that are all wall or all ramp, it beco
 */
 
 #include "mainwindow.h"
+#include <cstdlib>
+#include <ctime>
 
 public mapVector initialiseMap(mapVector map) {
 	//TODO: implement chances for levels between 1 and 2
-	// implement proper random syntax and seeding for c++
-	double holeChance = 0.05f;
-	double obstacleChance = 0.10f;
-	double openspaceChance = 0.60f;
-	double rampChance = 0.24f;
-	double victimChance = 0.01f;
+	// float victimChance = 0.01f;
+	// float holeChance = 0.05f;
+	// float obstacleChance = 0.10f;
+	// float rampChance = 0.24f;
+	// float openspaceChance = 0.60f;
+	
+	
 
-	srand(time(NULL));
+	srand(time(0));
 
-	for (int x=0; x<width; x++){
-		for (int y=0; y<height; y++){
-			if(random() < holeChance) {
-				map[x][y] =  -3;
-			}
-			else if (rand() < obstacleChance) {
-				map[x][y] = -2;
-			}
-			else if (rand() < openspaceChance) {
-				map[x][y] = 1;
-			}
-			else if (rand() < rampChance) {
-				map[x][y] = 2;
-			}
-			else if (rand() < victimChance) {
+	for (int x=0; x < 20; x++){
+		for (int y=0; y < 20; y++){
+			//fix random number so its not in every if statement, and so it's a 2 place FLOAT
+			double num = (rand() % 100) / 100 ;
+			
+			
+			if (num <= 0.01f) {
 				map[x][y] = 4;
 			}
+			else if(num <= 0.06f) {
+				map[x][y] =  -3;
+			}
+			else if (num <= 0.16f) {
+				map[x][y] = -2;
+			}
+			else if (num <= 0.40f) {
+				map[x][y] = 2;
+			}
+			else if (num <= 1.00f) {
+				map[x][y] = 1;
+			}	
 		}
 	}
 
@@ -57,7 +64,7 @@ public mapVector initialiseMap(mapVector map) {
 
 
 public mapVector doSimulationStep(mapVector oldMap) {
-	mapVector newMap; // do I need to implement the size?
+	mapVector newMap;
 	
 	//loop over each row and column of the map
 	for(int x=0; x < oldMap.length; x++){
@@ -192,13 +199,14 @@ public int countHighestNeighbour(mapVector map, int x, int y) {
 
 public mapVector generateMap(){
 	//create a new map
-	boolean[][] cellmap = new boolean[width][height];
+	mapVector cellmap;
 	//set up the map with random values
 	cellmap = initialiseMap(cellmap);
 	//and now run the simulation for a set number of steps
-	for (int i=0; i<numberOfSteps; i++){
+	for (int i=0; i < 3; i++){
 		cellmap = doSimulationStep(cellmap);
 	}
-	return 
+	//convert to mapVector, leave as array throughout process
+	return cellmap;
 }
 
