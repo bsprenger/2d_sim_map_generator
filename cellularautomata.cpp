@@ -171,17 +171,18 @@ public int countHighestNeighbour(mapVector map, int x, int y) {
 		}
 	}
 	// TODO : combine if statements
-	if (wallCount > rampCount) {
-		if (wallCount >= 3) {
-			return -2; //check syntax for this
-		}
+	if (wallCount > rampCount && wallCount >= 3) {
+		return -2; //check syntax for this
 	}
-	else if (rampCount > wallCount) {
-		if (rampCount > 3) {
-			return 2;
-		}
+	else if (rampCount > wallCount && rampCount > 3) {
+		return 2;
 	}
-	else if (rampCount == wallCount)
+	else if (rampCount == wallCount && rampCount > 3) {
+		return 2;
+	}
+	else {
+		return 0;
+	}
 }
 
 
